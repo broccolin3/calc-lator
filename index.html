@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Lego Brick Calculator - Flirty Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Black', -apple-system, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ece9ff;
+        }
+
+        /* OUTER MAIN CASE - DARK PURPLE */
+        .tyco-frame {
+            width: 380px;
+            background: #3b0764;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 
+                0 12px 0 #2e0854,
+                0 25px 35px rgba(0,0,0,0.4);
+            border: 4px solid #2e0854;
+        }
+
+        /* DISPLAY SECTOR (MAGENTA BASEPLATE) */
+        .display-plate {
+            background: #802060; 
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            
+            /* Stud design for the background */
+            background-image: radial-gradient(#9d2d77 28%, transparent 32%);
+            background-size: 20px 20px;
+        }
+
+        /* SOLAR PANEL SIMULATION */
+        .solar-panel {
+            width: 60px;
+            height: 32px;
+            background: #201021;
+            border: 3px solid #3b0764;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+
+        /* RETRO LCD DISPLAY */
+        .lcd-screen {
+            width: 240px;
+            height: 54px;
+            background: #c3cbbf; 
+            border: 4px solid #3a3f35;
+            padding: 6px 12px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.6rem;
+            color: #2b3028;
+            text-align: right;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index: 2;
+            border-radius: 2px;
+        }
+
+        /* MAIN BUTTON BASEPLATE (MAGENTA) */
+        .button-plate {
+            background: #802060;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.4);
+            
+            /* Dense Grid of studs */
+            background-image: radial-gradient(rgba(157, 45, 119, 0.6) 30%, transparent 35%);
+            background-size: 24px 24px;
+
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px 12px;
+            justify-items: center;
+        }
+
+        /* CHUNKY RECTANGULAR BRICK BUTTONS */
+        .brick-btn {
+            border: none;
+            outline: none;
+            cursor: pointer;
+            width: 68px;
+            height: 52px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-radius: 4px;
+            transition: transform 0.05s steps(2), box-shadow 0.05s steps(2);
+        }
+
+        /* AUTHENTIC 2x2 STUD LOOK FOR STANDARD BUTTONS */
+        .brick-btn::before, .brick-btn::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            top: 4px;
+            box-shadow: inset 0 2px 2px rgba(255,255,255,0.4), 0 2px 2px rgba(0,0,0,0.2);
+        }
+        .brick-btn::before { left: 12px; }
+        .brick-btn::after { right: 12px; }
+
+        /* BRICK COLOR PALETTES */
+        .purple-light {
+            background: #c084fc; /* Lavender */
+            color: #ffffff;
+            box-shadow: inset 0 3px 0 rgba(255,255,255,0.4), inset 0 -4px 0 rgba(0,0,0,0.2), 0 5px 0 #9333ea;
+        }
+        .purple-light::before, .purple-light::after { background: #c084fc; }
+
+        .purple-dark {
+            background: #6b21a8; /* Deep Purple */
+            color: #ffffff;
+            box-shadow: inset 0 3px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.25), 0 5px 0 #4c1d95;
+        }
+        .purple-dark::before, .purple-dark::after { background: #6b21a8; }
+
+        .pink-accent {
+            background: #f472b6; /* Pink Accent */
+            color: #ffffff;
+            box-shadow: inset 0 3px 0 rgba(255,255,255,0.4), inset 0 -4px 0 rgba(0,0,0,0.2), 0 5px 0 #db2777;
+        }
+        .pink-accent::before, .pink-accent::after { background: #f472b6; }
+
+        /* MULTI-STUD SPECIALTY PIECES */
+        .zero-brick {
+            grid-column: span 2;
+            width: 148px;
+        }
+        .zero-brick::before { left: 24px; }
+        .zero-brick::after { right: 24px; }
+
+        /* PRESSED BUTTON EFFECT */
+        .brick-btn:active {
+            transform: translateY(4px);
+        }
+        .purple-light:active { box-shadow: inset 0 2px 0 rgba(255,255,255,0.3), 0 1px 0 #9333ea; }
+        .purple-dark:active { box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 1px 0 #4c1d95; }
+        .pink-accent:active { box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 1px 0 #db2777; }
+
+        /* TEXT INSIDE BUTTONS */
+        .brick-btn span {
+            z-index: 3;
+            text-shadow: 0 -1px 1px rgba(0,0,0,0.4), 0 1px 1px rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<audio id="flirtMusic" src="romantic-music.mp3" preload="auto" loop></audio>
+
+<div class="tyco-frame">
+    <div class="display-plate">
+        <div class="solar-panel"></div>
+        <div id="display" class="lcd-screen">0</div>
+    </div>
+
+    <div class="button-plate">
+        <!-- Row 1 -->
+        <button class="brick-btn purple-dark" onclick="handleBtnClick('AC')"><span>AC</span></button>
+        <button class="brick-btn purple-dark" onclick="handleBtnClick('DEL')"><span>DEL</span></button>
+        <button class="brick-btn pink-accent" onclick="handleBtnClick('/')"><span>÷</span></button>
+        <button class="brick-btn pink-accent" onclick="handleBtnClick('*')"><span>×</span></button>
+
+        <!-- Row 2 -->
+        <button class="brick-btn purple-light" onclick="handleBtnClick('7')"><span>7</span></button>
+        <button class="brick-btn purple-light" onclick="handleBtnClick('8')"><span>8</span></button>
+        <button class="brick-btn purple-light" onclick="handleBtnClick('9')"><span>9</span></button>
+        <button class="brick-btn pink-accent" onclick="handleBtnClick('-')"><span>-</span></button>
+
+        <!-- Row 3 -->
+        <button class="brick-btn purple-light" onclick="handleBtnClick('4')"><span>4</span></button>
+        <button class="brick-btn purple-light" onclick="handleBtnClick('5')"><span>5</span></button>
+        <button class="brick-btn purple-light" onclick="handleBtnClick('6')"><span>6</span></button>
+        <button class="brick-btn pink-accent" onclick="handleBtnClick('+')"><span>+</span></button>
+
+        <!-- Row 4 -->
+        <button class="brick-btn purple-light" onclick="handleBtnClick('1')"><span>1</span></button>
+        <button class="brick-btn purple-light" onclick="handleBtnClick('2')"><span>2</span></button>
+        <button class="brick-btn purple-light" onclick="handleBtnClick('3')"><span>3</span></button>
+        <button class="brick-btn pink-accent" onclick="handleBtnClick('=')"><span>=</span></button>
+
+        <!-- Row 5 -->
+        <button class="brick-btn purple-light zero-brick" onclick="handleBtnClick('0')"><span>0</span></button>
+        <button class="brick-btn purple-light" onclick="handleBtnClick('.')"><span>.</span></button>
+    </div>
+</div>
+
+<script>
+    const display = document.getElementById('display');
+    const music = document.getElementById('flirtMusic');
+    let shouldResetDisplay = false;
+
+    const flirtyMessages = [
+        "hey pooko 😉",
+        "kissy kissy!",
+        "my baby girl ✨",
+        "I miss yoü 🥰",
+        "pahingi ng kiss ^3^"
+    ];
+
+    // GENERATE MECHANICAL PLASTIC CLICK SOUND
+    function playClickSound() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioContext();
+            
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(140, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(35, ctx.currentTime + 0.04);
+            
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+            
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            osc.start();
+            osc.stop(ctx.currentTime + 0.04);
+        } catch(e) {
+            console.log("Audio presentation blocked.");
+        }
+    }
+
+    // DISPATCH INPUTS
+    function handleBtnClick(val) {
+        playClickSound();
+        
+        if (val === 'AC') {
+            clearDisplay();
+        } else if (val === 'DEL') {
+            deleteLast();
+        } else if (val === '=') {
+            calculate();
+        } else {
+            appendValue(val);
+        }
+    }
+
+    function appendValue(input) {
+        const operators = ['+', '-', '*', '/'];
+        
+        // Reset display conditions if error, calculation finished, or initial zero state
+        if (display.innerText === '0' || shouldResetDisplay || display.innerText.includes('po') || display.innerText.includes('matyü') || display.innerText.includes(')')) {
+            if (operators.includes(input)) {
+                display.innerText = '0' + input;
+            } else if (input === '.') {
+                display.innerText = '0.';
+            } else {
+                display.innerText = input;
+            }
+            shouldResetDisplay = false;
+            return;
+        }
+
+        // Prevent duplicate decimals in a single number group
+        if (input === '.') {
+            const parts = display.innerText.split(/[\+\-\*\/]/);
+            const currentNum = parts[parts.length - 1];
+            if (currentNum.includes('.')) return;
+        }
+
+        display.innerText += input;
+    }
+
+    function deleteLast() {
+        if (shouldResetDisplay || display.innerText.includes('po') || display.innerText.includes('matyü') || display.innerText.includes(')')) {
+            clearDisplay();
+            return;
+        }
+        
+        if (display.innerText.length > 1) {
+            display.innerText = display.innerText.slice(0, -1);
+        } else {
+            display.innerText = '0';
+        }
+    }
+
+    function clearDisplay() {
+        display.innerText = '0';
+        display.style.fontSize = "1.6rem";
+        shouldResetDisplay = false;
+        
+        music.pause();
+        music.currentTime = 0;
+    }
+
+    function calculate() {
+        try {
+            let expression = display.innerText;
+
+            // RULE 1: Direct 1+4+3 evaluation trigger
+            if (expression === "1+4+3") {
+                display.style.fontSize = "1.1rem"; 
+                display.innerText = "I like ü matyu";
+                music.play().catch(e => console.log("Interaction required for audio"));
+                shouldResetDisplay = true;
+                return;
+            }
+
+            // Standardize string math expression formats
+            let sanitizedExpression = expression.replace(/×/g, '*').replace(/÷/g, '/');
+            let result = eval(sanitizedExpression);
+
+            if (result === Infinity || isNaN(result)) {
+                display.innerText = 'error po, love';
+                music.pause();
+            } else {
+                // RULE 2: Result totals exactly 3 drops flirty lines
+                if (result === 3) {
+                    display.style.fontSize = "1.1rem";
+                    let randomFlirt = flirtyMessages[Math.floor(Math.random() * flirtyMessages.length)];
+                    display.innerText = `${result} (${randomFlirt})`;
+                    music.play().catch(e => console.log("Interaction required for audio"));
+                } else {
+                    // Plain Math outputs
+                    display.style.fontSize = "1.6rem";
+                    display.innerText = Number(result.toFixed(8)).toString();
+                    music.pause();
+                    music.currentTime = 0;
+                }
+            }
+            shouldResetDisplay = true;
+        } catch (error) {
+            display.style.fontSize = "1.6rem";
+            display.innerText = 'error po, love';
+            music.pause();
+            shouldResetDisplay = true;
+        }
+    }
+</script>
+
+</body>
+</html>
