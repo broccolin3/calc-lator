@@ -178,7 +178,6 @@
 
 <!-- Audio Tracks -->
 <audio id="flirtMusic" src="SIGMA COLD RIZZ - QuickSounds.com.mp3" preload="auto" loop></audio>
-<!-- NEW: Music choice specifically for 1+4+3 -->
 <audio id="specialMusic" src="Honey RIZZ - QuickSounds.com.mp3" preload="auto" loop></audio>
 
 <div class="tyco-frame">
@@ -261,6 +260,12 @@
     // DISPATCH INPUTS
     function handleBtnClick(val) {
         playClickSound();
+
+        // FIX: Prime the browser's interaction requirements immediately upon user gesture
+        if (val === '=') {
+            music.load();
+            specialMusic.load();
+        }
         
         if (val === 'AC') {
             clearDisplay();
@@ -276,7 +281,6 @@
     function appendValue(input) {
         const operators = ['+', '-', '*', '/'];
         
-        // Reset display conditions if error, calculation finished, or initial zero state
         if (display.innerText === '0' || shouldResetDisplay || display.innerText.includes('po') || display.innerText.includes('matyü') || display.innerText.includes(')')) {
             if (operators.includes(input)) {
                 display.innerText = '0' + input;
@@ -289,7 +293,6 @@
             return;
         }
 
-        // Prevent duplicate decimals in a single number group
         if (input === '.') {
             const parts = display.innerText.split(/[\+\-\*\/]/);
             const currentNum = parts[parts.length - 1];
@@ -316,12 +319,7 @@
         display.innerText = '0';
         display.style.fontSize = "1.6rem";
         shouldResetDisplay = false;
-        
-        // Pause and reset all audio
-        music.pause();
-        music.currentTime = 0;
-        specialMusic.pause();
-        specialMusic.currentTime = 0;
+        stopAllAudio();
     }
 
     function stopAllAudio() {
@@ -340,12 +338,15 @@
                 stopAllAudio();
                 display.style.fontSize = "1.1rem"; 
                 display.innerText = "I like ü matyu";
-                specialMusic.play().catch(e => console.log("Interaction required for audio"));
+                
+                let playPromise = specialMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => console.log("Audio play blocked:", e));
+                }
                 shouldResetDisplay = true;
                 return;
             }
 
-            // Standardize string math expression formats
             let sanitizedExpression = expression.replace(/×/g, '*').replace(/÷/g, '/');
             let result = eval(sanitizedExpression);
 
@@ -359,9 +360,12 @@
                     display.style.fontSize = "1.1rem";
                     let randomFlirt = flirtyMessages[Math.floor(Math.random() * flirtyMessages.length)];
                     display.innerText = `${result} (${randomFlirt})`;
-                    music.play().catch(e => console.log("Interaction required for audio"));
+                    
+                    let playPromise = music.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(e => console.log("Audio play blocked:", e));
+                    }
                 } else {
-                    // Plain Math outputs
                     display.style.fontSize = "1.6rem";
                     display.innerText = Number(result.toFixed(8)).toString();
                     stopAllAudio();
@@ -378,4 +382,4 @@
 </script>
 
 </body>
-            </html>
+                                                                                                          </html>
