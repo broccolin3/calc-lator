@@ -176,7 +176,10 @@
 </head>
 <body>
 
+<!-- Audio Tracks -->
 <audio id="flirtMusic" src="SIGMA COLD RIZZ - QuickSounds.com.mp3" preload="auto" loop></audio>
+<!-- NEW: Music choice specifically for 1+4+3 -->
+<audio id="specialMusic" src="YOUR_NEW_TRACK_URL_HERE.mp3" preload="auto" loop></audio>
 
 <div class="tyco-frame">
     <div class="display-plate">
@@ -218,6 +221,7 @@
 <script>
     const display = document.getElementById('display');
     const music = document.getElementById('flirtMusic');
+    const specialMusic = document.getElementById('specialMusic');
     let shouldResetDisplay = false;
 
     const flirtyMessages = [
@@ -313,8 +317,18 @@
         display.style.fontSize = "1.6rem";
         shouldResetDisplay = false;
         
+        // Pause and reset all audio
         music.pause();
         music.currentTime = 0;
+        specialMusic.pause();
+        specialMusic.currentTime = 0;
+    }
+
+    function stopAllAudio() {
+        music.pause();
+        music.currentTime = 0;
+        specialMusic.pause();
+        specialMusic.currentTime = 0;
     }
 
     function calculate() {
@@ -323,9 +337,10 @@
 
             // RULE 1: Direct 1+4+3 evaluation trigger
             if (expression === "1+4+3") {
+                stopAllAudio();
                 display.style.fontSize = "1.1rem"; 
                 display.innerText = "I like ü matyu";
-                music.play().catch(e => console.log("Interaction required for audio"));
+                specialMusic.play().catch(e => console.log("Interaction required for audio"));
                 shouldResetDisplay = true;
                 return;
             }
@@ -336,10 +351,11 @@
 
             if (result === Infinity || isNaN(result)) {
                 display.innerText = 'error po, love';
-                music.pause();
+                stopAllAudio();
             } else {
                 // RULE 2: Result totals exactly 3 drops flirty lines
                 if (result === 3) {
+                    stopAllAudio();
                     display.style.fontSize = "1.1rem";
                     let randomFlirt = flirtyMessages[Math.floor(Math.random() * flirtyMessages.length)];
                     display.innerText = `${result} (${randomFlirt})`;
@@ -348,19 +364,18 @@
                     // Plain Math outputs
                     display.style.fontSize = "1.6rem";
                     display.innerText = Number(result.toFixed(8)).toString();
-                    music.pause();
-                    music.currentTime = 0;
+                    stopAllAudio();
                 }
             }
             shouldResetDisplay = true;
         } catch (error) {
             display.style.fontSize = "1.6rem";
             display.innerText = 'error po, love';
-            music.pause();
+            stopAllAudio();
             shouldResetDisplay = true;
         }
     }
 </script>
 
 </body>
-</html>
+            </html>
